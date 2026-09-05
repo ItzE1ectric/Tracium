@@ -28,52 +28,68 @@ return function(Shared)
 
 		local state = { Enabled = true }
 		local dragging = false
-		local dragStart = nil   -- Vector3 from input.Position
-		local startAbs = nil    -- Vector2 target.AbsolutePosition
-		local goal = nil        -- Vector2 desired absolute position
+		local dragStart = nil     -- Vector3 from input.Position
+		local startPos = nil      -- UDim2 target.Position at drag start
+		local goal = nil          -- UDim2 desired Position (offsets computed)
 
-		local function clampGoal(g, size)
+		local function clampGoal(x, y, size)
 			if not opts.Bounds then
-				return g
+				return x, y
 			end
 			local cam = Services.Workspace.CurrentCamera
 			local vp = cam and cam.ViewportSize or Vector2.new(1920, 1080)
-			local x = math.clamp(g.X, -size.X + 48, vp.X - 48)
-			local y = math.clamp(g.Y, 0, math.max(vp.Y - 48, 60))
-			return Vector2.new(x, y)
+			local minX = -size.X + 48
+			local maxX = vp.X - 48
+			return math.clamp(x, minX, maxX), math.clamp(y, 0, math.max(vp.Y - 48, 60))
 		end
 
 		local conns = {}
+
+		local DRAG_THRESHOLD = 3 -- px of movement before a drag begins
+		local armed = false
 
 		table.insert(conns, handle.InputBegan:Connect(function(input)
 			if not state.Enabled or not Utility.IsClick(input) then
 				return
 			end
-			dragging = true
+			armed = true
+			dragging = false
 			dragStart = input.Position
-			startAbs = target.AbsolutePosition
-			if opts.OnDragStart then
-				pcall(opts.OnDragStart)
-			end
+			startPos = target.Position
 			local ended
 			ended = input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-					ended:Disconnect()
-					if opts.OnDragEnd then
-						pcall(opts.OnDragEnd, goal)
+					armed = false
+					if dragging then
+						dragging = false
+						if opts.OnDragEnd then
+							pcall(opts.OnDragEnd, goal)
+						end
 					end
+					ended:Disconnect()
 				end
 			end)
 			table.insert(conns, ended)
 		end))
 
 		table.insert(conns, UIS.InputChanged:Connect(function(input)
-			if not dragging or not Utility.IsMove(input) then
+			if not armed or not Utility.IsMove(input) then
 				return
 			end
 			local delta = Vector2.new(input.Position.X - dragStart.X, input.Position.Y - dragStart.Y)
-			goal = clampGoal(startAbs + delta, target.AbsoluteSize)
+			if not dragging then
+				if math.abs(delta.X) < DRAG_THRESHOLD and math.abs(delta.Y) < DRAG_THRESHOLD then
+					return
+				end
+				dragging = true
+				if opts.OnDragStart then
+					pcall(opts.OnDragStart)
+				end
+			end
+			local ox = startPos.X.Offset + delta.X
+			local oy = startPos.Y.Offset + delta.Y
+			ox, oy = clampGoal(ox, oy, target.AbsoluteSize)
+			goal = UDim2.new(startPos.X.Scale, ox, startPos.Y.Scale, oy)
 		end))
 
 		-- smoothing pump
@@ -81,17 +97,19 @@ return function(Shared)
 			if not goal then
 				return
 			end
-			local cur = target.AbsolutePosition
-			local dx = goal.X - cur.X
-			local dy = goal.Y - cur.Y
-			if math.abs(dx) < 0.4 and math.abs(dy) < 0.4 then
-				target.Position = UDim2.new(0, goal.X, 0, goal.Y)
+			local cur = target.Position
+			local dx = goal.X.Offset - cur.X.Offset
+			local dy = goal.Y.Offset - cur.Y.Offset
+			if math.abs(dx) < 0.5 and math.abs(dy) < 0.5 then
+				target.Position = goal
 				if not dragging then
 					goal = nil
 				end
 				return
 			end
-			target.Position = UDim2.new(0, cur.X + dx * lerp, 0, cur.Y + dy * lerp)
+			target.Position = UDim2.new(
+				goal.X.Scale, cur.X.Offset + dx * lerp,
+				goal.Y.Scale, cur.Y.Offset + dy * lerp)
 		end))
 
 		function state:SetLerp(v)
