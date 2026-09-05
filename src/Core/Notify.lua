@@ -63,7 +63,7 @@ return function(Shared)
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		})
 		Utility.ProtectGui(gui)
-		gui.AncestorRemoved:Connect(function(_, parent)
+		gui.AncestryChanged:Connect(function(_, parent)
 			if parent == nil then
 				gui = nil
 				stacks = {}
@@ -337,10 +337,6 @@ return function(Shared)
 
 		table.insert(visible[pos], card)
 		active[card] = pos
-
-		function card.TraciumDismiss()
-			Notify:_dismiss(card)
-		end
 
 		return card
 	end

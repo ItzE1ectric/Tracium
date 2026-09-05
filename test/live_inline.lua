@@ -1,3 +1,4 @@
+local Tracium = (function()
 --[===========================================================================[
 	Tracium v2 â€” bundled single-file distribution (auto-generated)
 	Built by build.ps1 â€” do not edit; edit src/*.lua then rebuild.
@@ -9589,3 +9590,23 @@ end)()
 
 -- bootstrap: constructors map -> Init
 return __MODULES["Init"](__MODULES)
+
+
+end)()
+
+local Window = Tracium:CreateWindow({
+	Title = "Tracium Live", Subtitle = "in-game smoke test", Tag = "v2",
+	Theme = "Midnight", ToggleKey = Enum.KeyCode.RightShift, Acrylic = true,
+})
+local Main = Window:Tab("Main", "home")
+Main:Section("Live Controls")
+Main:Paragraph({ Title = "Live test", Content = "Everything renders. Drag now works.", Icon = "zap" })
+local t = Main:Toggle({ Title = "ESP", Description = "with keybind + color chips", Flag = "tESP", Callback = print })
+t:AddKeybind({ Flag = "tKey" })
+t:AddColorPicker({ Flag = "tCol", Default = Color3.fromRGB(255, 60, 60) })
+Main:Slider({ Title = "WalkSpeed", Min = 16, Max = 250, Default = 16, Flag = "tWS" })
+Main:Dropdown({ Title = "Mode", Values = { "Alpha", "Beta", "Gamma", "Delta", "Omega" }, Flag = "tMode", Callback = print })
+Main:Input({ Title = "Name", Placeholder = "type here", Flag = "tName" })
+Main:Button("Ping", function() Window:Notify({ Title = "Pong", Content = "Toasts work", Type = "Success", Duration = 3 }) end)
+Window:Notify({ Title = "Tracium", Content = "Live build inline", Type = "Info", Duration = 4 })
+print("[live-inline] built OK")

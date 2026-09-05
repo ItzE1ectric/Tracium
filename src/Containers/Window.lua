@@ -146,8 +146,6 @@ return function(Shared)
 					return
 				end
 				stopSpin()
-				Tween:Play(splash, "Fade", { GroupTransparency = 1 })
-				-- GroupTransparency only exists on CanvasGroup; fade via children instead
 				Tween:Play(spinner, "Fast", { ImageTransparency = 1 })
 				Tween:Play(lt, "Fast", { TextTransparency = 1 })
 				Tween:Play(ls, "Fast", { TextTransparency = 1 })

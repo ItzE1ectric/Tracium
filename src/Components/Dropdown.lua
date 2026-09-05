@@ -273,7 +273,7 @@ return function(Shared)
 			isOpen = true
 			Tween:Play(chevron, "Fast", { Rotation = 180 })
 
-			popup = Utility.New("Frame", {
+			popup = Utility.New("CanvasGroup", {
 				Name = "DropdownPopup",
 				BackgroundColor3 = Theme:Get("Surface"),
 				BorderSizePixel = 0,

@@ -116,7 +116,6 @@ return function(Shared)
 		titleLab.Text = title or ""
 		contentLab.Text = text
 		card.Visible = true
-		card.GroupTransparency = nil
 		card.BackgroundTransparency = 1
 		titleLab.TextTransparency = 1
 		contentLab.TextTransparency = 1

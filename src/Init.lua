@@ -93,11 +93,11 @@ local function Bootstrap(constructors)
 	Shared.Utility = Shared.Load("Core.Utility")
 	Shared.Signal = Shared.Load("Core.Signal")
 	Shared.Tween = Shared.Load("Core.Tween")
+	Shared.Theme = Shared.Load("Core.Theme") -- Theme before Tooltip: Tooltip captures it at chunk time
 	Shared.Icons = Shared.Load("Core.Icons")
 	Shared.Drag = Shared.Load("Core.Drag")
 	Shared.Acrylic = Shared.Load("Core.Acrylic")
 	Shared.Tooltip = Shared.Load("Core.Tooltip")
-	Shared.Theme = Shared.Load("Core.Theme")
 	Shared.Notify = Shared.Load("Core.Notify")
 	Shared.Config = Shared.Load("Core.Config")
 

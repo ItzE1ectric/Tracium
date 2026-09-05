@@ -157,7 +157,6 @@ return function(Shared)
 		visible = true
 		if panel then
 			panel.Visible = true
-			panel.GroupTransparency = nil
 			Tween:Play(panel, "PanelSlide", { Position = UDim2.new(0, 16, 0.35, 0) })
 		end
 		if Shared.RefreshKeybindList then

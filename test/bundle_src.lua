@@ -2162,7 +2162,6 @@ return function(Shared)
 		titleLab.Text = title or ""
 		contentLab.Text = text
 		card.Visible = true
-		card.GroupTransparency = nil
 		card.BackgroundTransparency = 1
 		titleLab.TextTransparency = 1
 		contentLab.TextTransparency = 1
@@ -2849,7 +2848,7 @@ return function(Shared)
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		})
 		Utility.ProtectGui(gui)
-		gui.AncestorRemoved:Connect(function(_, parent)
+		gui.AncestryChanged:Connect(function(_, parent)
 			if parent == nil then
 				gui = nil
 				stacks = {}
@@ -3123,10 +3122,6 @@ return function(Shared)
 
 		table.insert(visible[pos], card)
 		active[card] = pos
-
-		function card.TraciumDismiss()
-			Notify:_dismiss(card)
-		end
 
 		return card
 	end
@@ -4824,7 +4819,7 @@ return function(Shared)
 			isOpen = true
 			Tween:Play(chevron, "Fast", { Rotation = 180 })
 
-			popup = Utility.New("Frame", {
+			popup = Utility.New("CanvasGroup", {
 				Name = "DropdownPopup",
 				BackgroundColor3 = Theme:Get("Surface"),
 				BorderSizePixel = 0,
@@ -7769,8 +7764,6 @@ return function(Shared)
 					return
 				end
 				stopSpin()
-				Tween:Play(splash, "Fade", { GroupTransparency = 1 })
-				-- GroupTransparency only exists on CanvasGroup; fade via children instead
 				Tween:Play(spinner, "Fast", { ImageTransparency = 1 })
 				Tween:Play(lt, "Fast", { TextTransparency = 1 })
 				Tween:Play(ls, "Fast", { TextTransparency = 1 })
@@ -9340,7 +9333,6 @@ return function(Shared)
 		visible = true
 		if panel then
 			panel.Visible = true
-			panel.GroupTransparency = nil
 			Tween:Play(panel, "PanelSlide", { Position = UDim2.new(0, 16, 0.35, 0) })
 		end
 		if Shared.RefreshKeybindList then
@@ -9484,11 +9476,11 @@ local function Bootstrap(constructors)
 	Shared.Utility = Shared.Load("Core.Utility")
 	Shared.Signal = Shared.Load("Core.Signal")
 	Shared.Tween = Shared.Load("Core.Tween")
+	Shared.Theme = Shared.Load("Core.Theme") -- Theme before Tooltip: Tooltip captures it at chunk time
 	Shared.Icons = Shared.Load("Core.Icons")
 	Shared.Drag = Shared.Load("Core.Drag")
 	Shared.Acrylic = Shared.Load("Core.Acrylic")
 	Shared.Tooltip = Shared.Load("Core.Tooltip")
-	Shared.Theme = Shared.Load("Core.Theme")
 	Shared.Notify = Shared.Load("Core.Notify")
 	Shared.Config = Shared.Load("Core.Config")
 
